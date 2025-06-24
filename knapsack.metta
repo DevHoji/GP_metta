@@ -1,0 +1,28 @@
+!(bind! items (
+  ( 2 3)
+  ( 3 4)
+  ( 4 5)
+  (5 6)
+  (7 2)
+))
+!(bind! capacity 10)
+!(bind! population-size 50)
+!(bind! generations 10)
+!(bind! mutation-rate 0.1)
+!(bind! crossover-rate 0.7)
+!(bind! tr  5)
+(= (create-individual $n) 
+(if (> 0 $n )
+()
+  (let* (
+    (rng (create-random-generator))
+    (random-int (fn [min max] (random-integer rng min max)))
+    (cons-atom (fn [x xs] (cons x xs)))
+  )
+)
+  (cons-atom (random-int &rng 0 2) (create-individual (- $n 1)))
+  
+  
+)
+)
+!(create-individual 5)
