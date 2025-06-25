@@ -1,4 +1,3 @@
-
 !(bind! items (
   ( 2 3);water-bottle
   ( 3 4);sandwich
@@ -13,6 +12,8 @@
 !(bind! mutation-rate 0.2)
 !(bind! crossover-rate 0.7)
 !(bind! top  5)
+
+
 (= (create-individual $n) 
 (if (>= 0 $n )
 ()
@@ -21,11 +22,10 @@
       ($tail(create-individual (- $n 1)))
   )
   (cons-atom  $rnd $tail)
-)
-  
-   
+)  
 )
 )
+
 ; !(create-individual 5)
  
 (= (create-population $size)
@@ -139,6 +139,20 @@
         ($top5 (top-5 $sorted-pop 5))
       )
       $top5
+)))(= (eva-helper $ind ) ((fitness 0 $ind 0 0) $ind))
+
+;evaluation
+(= (evaluate $population)
+  (if (== $population ())
+      ()
+      (let* (
+        ($scoredpop (collapse (eva-helper (superpose $population))))
+        (() (println! ($scoredpop)))
+        ($sorted-pop (selectionSort $scoredpop population-size))
+        (() (println! ($sorted-pop)))
+        ($top5 (top-5 $sorted-pop 5))
+      )
+      $top5
 )))
 
 ! (evaluate ((1 0 0 0 1) (1 1 1 1 1) (0 1 0 0 1) (1 1 1 1 0) (0 1 1 0 0) (0 1 1 0 0) (1 1 0 0 1) (1 1 0 0 1) (0 1 0 1 1) (1 0 1 1 1)))
@@ -171,6 +185,21 @@
   )
 )
 
+(= (mutate $ind $rate)
+  (if (== $ind ())
+      ()
+      (let* (
+          ($head (car-atom $ind))
+          ($tail (cdr-atom $ind))
+          ($rand (py-call (py-dot random random) ()))
+          ($new-head (if (< $rand $rate)
+                         (if (== $head 1) 0 1)
+                         $head))
+          ($new-tail (mutate $tail $rate))
+      )
+      (cons-atom $new-head $new-tail))
+  )
+)
 
 (= (generate-pop $size $top5)
   (if (== $size 0)
@@ -180,12 +209,13 @@
       ($par2 (index-atom  $top5 (random-int &rng 0 5)))
       ($p1 (cdr-atom $par1))
       ($p2 (cdr-atom $par2))
-      (($child) (crossover $p1 $p2))
+      (($child) (mutate (crossover $p1 $p2) mutation-rate)) ; mutation added here
       ($rest (generate-pop (- $size 1) $top5))
     )
     (cons-atom $child $rest )
   ))
 )
+
 ; ! (generate-pop 5 ((1 1 0 1) (1 0 1 0) (0 1 1 1) (0 0 0 1) (1 1 1 0)))
 (= (Generation $n $pop $pop-size $top )
   (let* (
